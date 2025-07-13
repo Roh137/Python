@@ -1,0 +1,59 @@
+# weather_visualization.py
+
+import requests
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# ------------------------- CONFIGURATION -------------------------
+API_KEY = "YOUR_API_KEY"  # Replace with your OpenWeatherMap API key
+CITY = "Delhi"
+DAYS = 5
+URL = f"http://api.openweathermap.org/data/2.5/forecast?q={CITY}&appid={API_KEY}&units=metric"
+# ------------------------------------------------------------------
+
+def fetch_weather_data():
+    """Fetch weather data from OpenWeatherMap API."""
+    response = requests.get(URL)
+    if response.status_code != 200:
+        raise Exception("API request failed. Check your API key or city name.")
+    return response.json()
+
+def parse_weather_data(data):
+    """Parse and structure weather data into a DataFrame."""
+    records = []
+    for entry in data['list']:
+        timestamp = entry['dt_txt']
+        temperature = entry['main']['temp']
+        humidity = entry['main']['humidity']
+        weather = entry['weather'][0]['main']
+        records.append({
+            "Time": timestamp,
+            "Temperature (°C)": temperature,
+            "Humidity (%)": humidity,
+            "Condition": weather
+        })
+    df = pd.DataFrame(records)
+    df['Time'] = pd.to_datetime(df['Time'])
+    return df
+
+def visualize_data(df):
+    """Visualize weather data using Matplotlib and Seaborn."""
+    plt.figure(figsize=(14, 6))
+    sns.lineplot(x="Time", y="Temperature (°C)", data=df, label="Temperature")
+    sns.lineplot(x="Time", y="Humidity (%)", data=df, label="Humidity")
+    plt.xticks(rotation=45)
+    plt.title(f"5-Day Weather Forecast for {CITY}")
+    plt.xlabel("Time")
+    plt.ylabel("Values")
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig("weather_chart.png")
+    plt.show()
+
+if __name__ == "__main__":
+    print(f"Fetching weather data for {CITY}...")
+    weather_json = fetch_weather_data()
+    weather_df = parse_weather_data(weather_json)
+    print(weather_df.head())
+    visualize_data(weather_df)
