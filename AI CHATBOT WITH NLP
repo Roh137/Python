@@ -1,0 +1,21 @@
+# chatbot_nlp.py
+
+import nltk
+from nltk.chat.util import Chat, reflections
+
+# Predefined chatbot pairs for simple conversation
+pairs = [
+    [r"hi|hello", ["Hello!", "Hi there!"]],
+    [r"what is your name?", ["I'm your friendly chatbot."]],
+    [r"how are you?", ["I'm good, thank you!"]],
+    [r"(.*) your name?", ["My name is CodBot."]],
+    [r"quit", ["Bye! Take care."]],
+]
+
+def run_chatbot():
+    print("Hello! I am CodBot. Type 'quit' to exit.")
+    chatbot = Chat(pairs, reflections)
+    chatbot.converse()
+
+if __name__ == "__main__":
+    run_chatbot()
