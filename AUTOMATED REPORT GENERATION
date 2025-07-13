@@ -1,0 +1,39 @@
+# automated_report.py
+
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+import csv
+
+def read_data(file_path):
+    """Reads CSV data and returns it as a list of dictionaries."""
+    data = []
+    with open(file_path, newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            data.append(row)
+    return data
+
+def generate_report(data, output_path):
+    """Generates a PDF report from the given data."""
+    pdf = canvas.Canvas(output_path, pagesize=letter)
+    pdf.setTitle("Automated Report")
+    
+    pdf.drawString(100, 750, "Automated Report Summary")
+    y = 700
+    for record in data:
+        line = ', '.join([f"{key}: {value}" for key, value in record.items()])
+        pdf.drawString(50, y, line)
+        y -= 20
+        if y < 100:
+            pdf.showPage()
+            y = 750
+
+    pdf.save()
+
+if __name__ == "__main__":
+    file_path = "sample_data.csv"
+    output_pdf = "generated_report.pdf"
+    
+    data = read_data(file_path)
+    generate_report(data, output_pdf)
+    print("Report generated successfully.")
